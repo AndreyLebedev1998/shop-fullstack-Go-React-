@@ -1,0 +1,11 @@
+┌─────────────────────────────────┐
+│ General                         │
+│   Name: PostgreSQL              │
+├─────────────────────────────────┤
+│ Connection                      │
+│   Host: postgres                │
+│   Port: 5432                    │
+│   Maintenance database: mydb    │
+│   Username: postgres            │
+│   Password: mypassword          |
+└─────────────────────────────────┘
