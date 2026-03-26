@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"os"
 	"shop/cors"
+	"shop/endpoints/categories"
 	"shop/endpoints/products"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 
@@ -40,9 +42,11 @@ func main() {
 	var ctx = context.Background()
 
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT"),
-		Password: os.Getenv("REDIS_PASSWORD"),
-		DB:       0,
+		Addr:        os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT"),
+		Password:    os.Getenv("REDIS_PASSWORD"),
+		DB:          0,
+		MaxRetries:  3,
+		DialTimeout: 3 * time.Second,
 	})
 
 	if err := rdb.Ping(ctx).Err(); err != nil {
@@ -58,7 +62,11 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.Handle("/products", cors.WithCORS(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		products.GetAllProductsByCategoryId(w, r, db)
+		products.GetAllProductsByCategoryId(w, r, db, rdb)
+	})))
+
+	mux.Handle("/categories", cors.WithCORS(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		categories.GetAllCategories(w, r, db, rdb)
 	})))
 
 	http.ListenAndServe(":8080", mux)

@@ -7,9 +7,12 @@ import (
 	"fmt"
 	"net/http"
 	"shop/models"
+	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
-func getAllCategories(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+func GetAllCategories(w http.ResponseWriter, r *http.Request, db *sql.DB, rdb *redis.Client) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -17,6 +20,19 @@ func getAllCategories(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	var categories []models.Categorie
 	var ctx context.Context = context.Background()
+
+	cacheKey := "categories:all"
+
+	val, err := rdb.Get(ctx, cacheKey).Result()
+	if err == nil {
+		if json.Unmarshal([]byte(val), &categories) == nil {
+			w.Header().Add("Content-Type", "application/json")
+			fmt.Println("Redis")
+			json.NewEncoder(w).Encode(categories)
+			return
+		}
+	}
+
 	var query string = "SELECT * FROM categories"
 
 	rows, err := db.QueryContext(ctx, query)
@@ -37,5 +53,9 @@ func getAllCategories(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		categories = append(categories, category)
 	}
 
+	bytes, _ := json.Marshal(categories)
+	rdb.Set(ctx, cacheKey, bytes, 5*time.Second)
+
+	w.Header().Add("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(categories)
 }
