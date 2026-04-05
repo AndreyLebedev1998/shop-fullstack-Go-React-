@@ -1,7 +1,6 @@
 package categories
 
 import (
-	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -19,7 +18,7 @@ func GetAllCategories(w http.ResponseWriter, r *http.Request, db *sql.DB, rdb *r
 	}
 
 	var categories []models.Categorie
-	var ctx context.Context = context.Background()
+	var ctx = r.Context()
 
 	cacheKey := "categories:all"
 
@@ -56,6 +55,6 @@ func GetAllCategories(w http.ResponseWriter, r *http.Request, db *sql.DB, rdb *r
 	bytes, _ := json.Marshal(categories)
 	rdb.Set(ctx, cacheKey, bytes, 5*time.Second)
 
-	w.Header().Add("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(categories)
 }

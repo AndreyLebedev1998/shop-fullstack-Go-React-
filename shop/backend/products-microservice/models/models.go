@@ -25,6 +25,7 @@ type Product struct {
 	ProductName string  `json:"product_name"`
 	Price       float64 `json:"price"`
 	CategoryId  int     `json:"category_id"`
+	ImageUrl    *string `json:"image_url"`
 }
 
 type Categorie struct {

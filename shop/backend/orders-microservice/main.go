@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"orders-microservice/cors"
+	"orders-microservice/endpoints/orders"
 	"os"
 	"time"
 
@@ -34,7 +36,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println("✅ Подключено к PostgreSQL")
+	fmt.Println("✅ Подключено к PostgreSQL orders-microservice")
 
 	var ctx = context.Background()
 
@@ -50,13 +52,25 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println("✅ Подключено к Redis")
+	fmt.Println("✅ Подключено к Redis orders-microservice")
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("🔥 Работает! Сервер перезапустился!"))
 	})
 
 	mux := http.NewServeMux()
+
+	mux.Handle("/create-order", cors.WithCORS(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		orders.CreateOrder(w, r, db)
+	})))
+
+	mux.Handle("/change-order", cors.WithCORS(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		orders.ChangeOrder(w, r, db)
+	})))
+
+	mux.Handle("/get-orders-by-parametr", cors.WithCORS(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		orders.GetOrdersByParametr(w, r, db)
+	})))
 
 	http.ListenAndServe(":8080", mux)
 }

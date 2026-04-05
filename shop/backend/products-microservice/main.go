@@ -37,7 +37,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println("✅ Подключено к PostgreSQL")
+	fmt.Println("✅ Подключено к PostgreSQL products-microservice")
 
 	var ctx = context.Background()
 
@@ -53,7 +53,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println("✅ Подключено к Redis")
+	fmt.Println("✅ Подключено к Redis products-microservice")
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("🔥 Работает! Сервер перезапустился!"))

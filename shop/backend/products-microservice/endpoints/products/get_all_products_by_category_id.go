@@ -1,7 +1,6 @@
 package products
 
 import (
-	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -20,7 +19,7 @@ func GetAllProductsByCategoryId(w http.ResponseWriter, r *http.Request, db *sql.
 	}
 
 	var category_id string
-	var ctx context.Context = context.Background()
+	var ctx = r.Context()
 	var products []models.Product
 	var idStr string = r.URL.Query().Get("id")
 	id, err := strconv.Atoi(idStr)
@@ -62,7 +61,7 @@ func GetAllProductsByCategoryId(w http.ResponseWriter, r *http.Request, db *sql.
 	for rows.Next() {
 		var product models.Product
 
-		err := rows.Scan(&product.Id, &product.ProductName, &product.CategoryId, &product.Price)
+		err := rows.Scan(&product.Id, &product.ProductName, &product.CategoryId, &product.Price, &product.ImageUrl)
 
 		if err != nil {
 			fmt.Println("Error reading line")
@@ -73,7 +72,7 @@ func GetAllProductsByCategoryId(w http.ResponseWriter, r *http.Request, db *sql.
 		products = append(products, product)
 	}
 
-	w.Header().Add("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 
 	bytes, _ := json.Marshal(products)
 	rdb.Set(ctx, cacheKey, bytes, 5*time.Minute)

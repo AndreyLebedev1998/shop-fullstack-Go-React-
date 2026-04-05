@@ -71,6 +71,36 @@ services:
     environment:
       DB_CONN: "user=postgres password=mypassword dbname=shop-database host=postgres sslmode=disable"
 
+  admin-microservice:
+    build: ./backend/admin-microservice
+    restart: always
+    ports:
+      - "8092:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - ./backend/admin-microservice:/admin-microservice
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: mypassword
+      DB_NAME: shop-database
+      JWT_SECRET: 8fhj3k4j5h2k3j4h5k6j7h8k9j2h3j4k5h6j7h8k9j0k1j2h3g4f5d6s7a8s9d0f
+      DB_CONN: "user=postgres password=mypassword dbname=shop-database host=postgres sslmode=disable"
+      GOOSE_MIGRATION_DIR: "./migrations"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: myredispassword
+
   redis:
     image: redis:7-alpine
     container_name: redis
