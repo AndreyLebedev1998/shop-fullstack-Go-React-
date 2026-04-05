@@ -1,0 +1,50 @@
+basePath: /
+definitions:
+  models.Product:
+    properties:
+      category_id:
+        type: integer
+      id:
+        type: integer
+      image_url:
+        type: string
+      price:
+        type: number
+      product_name:
+        type: string
+    type: object
+host: localhost:8090
+info:
+  contact: {}
+  description: prodcuts-microservice
+  title: Vanilla Go API
+  version: "1.0"
+paths:
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Returns products by category_id
+      parameters:
+      - description: category_id
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Product'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: find products by category_id
+      tags:
+      - products
+swagger: "2.0"

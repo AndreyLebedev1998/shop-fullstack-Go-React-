@@ -17,7 +17,7 @@ func GetAllCategories(w http.ResponseWriter, r *http.Request, db *sql.DB, rdb *r
 		return
 	}
 
-	var categories []models.Categorie
+	var categories []models.Category
 	var ctx = r.Context()
 
 	cacheKey := "categories:all"
@@ -41,7 +41,7 @@ func GetAllCategories(w http.ResponseWriter, r *http.Request, db *sql.DB, rdb *r
 	}
 
 	for rows.Next() {
-		var category models.Categorie
+		var category models.Category
 		err := rows.Scan(&category.Id, &category.CategoryName)
 		if err != nil {
 			fmt.Println("Error reading line")

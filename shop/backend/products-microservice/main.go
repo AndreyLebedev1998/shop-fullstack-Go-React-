@@ -11,10 +11,20 @@ import (
 	"products-microservice/endpoints/products"
 	"time"
 
+	httpSwagger "github.com/swaggo/http-swagger"
+
 	"github.com/redis/go-redis/v9"
+
+	_ "products-microservice/docs"
 
 	_ "github.com/lib/pq"
 )
+
+// @title Vanilla Go API
+// @version 1.0
+// @description prodcuts-microservice
+// @host localhost:8090
+// @BasePath /
 
 func main() {
 	host := os.Getenv("DB_HOST")
@@ -68,6 +78,8 @@ func main() {
 	mux.Handle("/categories", cors.WithCORS(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		categories.GetAllCategories(w, r, db, rdb)
 	})))
+
+	mux.Handle("/swagger/", httpSwagger.WrapHandler)
 
 	http.ListenAndServe(":8080", mux)
 }

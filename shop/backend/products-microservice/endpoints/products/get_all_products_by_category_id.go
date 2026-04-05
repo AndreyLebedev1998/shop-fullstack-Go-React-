@@ -12,6 +12,17 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// @Summary find products by category_id
+// @Description Returns products by category_id
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param id query int true "category_id" minimum(1) example(1)
+// @Success 200 {array} models.Product "Successful response"
+// @Failure 400 {string} string "Invalid category_id"
+// @Failure 405 {string} string "Method not allowed"
+// @Router /products [get]
+
 func GetAllProductsByCategoryId(w http.ResponseWriter, r *http.Request, db *sql.DB, rdb *redis.Client) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -78,4 +89,24 @@ func GetAllProductsByCategoryId(w http.ResponseWriter, r *http.Request, db *sql.
 	rdb.Set(ctx, cacheKey, bytes, 5*time.Minute)
 
 	json.NewEncoder(w).Encode(products)
+}
+
+func GetAllProductsHandler(db *sql.DB, rdb *redis.Client) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		GetAllProductsByCategoryId(w, r, db, rdb)
+	}
+}
+
+// @Summary find products by category_id
+// @Description Returns products by category_id
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param id query int true "category_id"
+// @Success 200 {array} models.Product
+// @Failure 400 {string} string
+// @Failure 405 {string} string "Method not allowed"
+// @Router /products [get]
+func GetAllProductsForSwagger(w http.ResponseWriter, r *http.Request) {
+	// Пустое тело, только для Swagger
 }
